@@ -17,6 +17,13 @@ migrate_working_dir/
 *.ipr
 *.iws
 .idea/
+.metadata
+# Environment variables
+.env
+
+# Android local config
+android/local.properties
+
 
 # The .vscode folder contains launch configuration and tasks you configure in
 # VS Code which you may wish to be included in version control, so this line

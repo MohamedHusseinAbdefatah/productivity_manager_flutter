@@ -9,6 +9,10 @@ class AuthStorage {
     _box.write(_tokenKey, token);
   }
 
+  void saveLoginStatus(bool status) {
+    _box.write('isloggedin', status);
+  }
+
   String? getToken() {
     return _box.read(_tokenKey);
   }

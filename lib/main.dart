@@ -1,35 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:productivity_manager/modules/auth/view/login_screen.dart';
-
-import 'modules/auth/controller.dart';
+import 'package:productivity_manager/core/routes/pages.dart';
+import 'package:productivity_manager/core/routes/routes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
-  Get.put(AuthController()); // ✅ ONE TIME
-  runApp(const MyApp());
+  bool isloggedin = GetStorage().read('isloggedin') ?? false;
+  runApp(MyApp(isLoggedIn: isloggedin));
 }
 
-
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({super.key, required this.isLoggedIn});
+  final bool isLoggedIn;
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-              // Get.put(AuthController());
-
     return GetMaterialApp(
-
-      title: 'Flutter Demo',
+      title: 'Productivity Manager',
       theme: ThemeData(
-     
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
       ),
-      initialRoute: '/',
-      home: const LoginScreen()
+      initialRoute: isLoggedIn ? AppRoutes.notebook : AppRoutes.login,
+      getPages: AppPages.pages,
+      debugShowCheckedModeBanner: false,
     );
   }
 }

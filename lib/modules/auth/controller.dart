@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:productivity_manager/modules/auth/view/login_screen.dart';
+import '../../core/routes/routes.dart';
 import '../../core/storage/auth_storage.dart';
 import '../Home/home_screen.dart';
 import 'auth_api.dart';
@@ -26,6 +27,18 @@ class AuthController extends GetxController {
   final AuthApiService api = AuthApiService();
   final AuthStorage storage = AuthStorage();
 
+  AuthController() {
+    // Check if user is already logged in
+    _checkLoginStatus();
+  }
+
+  void _checkLoginStatus() async {
+    final token = await storage.getToken();
+    if (token != null && token.isNotEmpty) {
+      isLoggedIn.value = true;
+    }
+  }
+
   void togglePassword() {
     isPasswordHidden.toggle();
   }
@@ -42,10 +55,11 @@ class AuthController extends GetxController {
       final token = await api.login(email, password);
       if (token == null) throw Exception('No token returned');
       if (rememberMe.value) {
-  storage.saveToken(token);
-}
+        storage.saveToken(token);
+        storage.saveLoginStatus(true);
+      }
       isLoggedIn.value = true;
-      Get.off(HomeScreen())  ;
+      Get.offNamed(AppRoutes.notebook);
     } catch (e) {
       final msg = e is Exception ? e.toString() : 'Invalid credentials';
       Get.snackbar('Error', msg);
@@ -70,8 +84,6 @@ class AuthController extends GetxController {
     try {
       final response = await api.signup(name, email, password);
       if (response != null) {
-        
-      
       } else {
         Get.snackbar('Success', 'Account created — please login');
         Get.to(LoginScreen());
@@ -82,12 +94,12 @@ class AuthController extends GetxController {
     }
   }
 
-void logout() {
-  storage.clearToken();
-  currentUser.value = null;
-  isLoggedIn.value = false;
-  Get.offAll(() => LoginScreen());
-}
+  void logout() {
+    storage.clearToken();
+    currentUser.value = null;
+    isLoggedIn.value = false;
+    Get.offAll(() => LoginScreen());
+  }
 
   @override
   void onClose() {
